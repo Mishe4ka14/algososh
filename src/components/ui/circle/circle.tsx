@@ -13,6 +13,7 @@ interface CircleProps {
   isSmall?: boolean;
 }
 
+
 export const Circle: React.FC<CircleProps> = ({
   state = ElementStates.Default,
   letter,
