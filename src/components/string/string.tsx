@@ -8,70 +8,95 @@ import { useState } from "react";
 import { Circle } from "../ui/circle/circle";
 import { ElementStates } from "../../types/element-states";
 
+interface ILetter {
+  letter: string;
+  state: ElementStates;
+}
+
 export const StringComponent: React.FC = () => {
 
-  const [arr, setArr] = useState<string[]>([]);
-  //счетчик шагов анимации
-  const [step, setStep] = useState(0);
-  const [string, setString] = useState(false);
-  //индекс цветов
-  const [color, setColor] = useState<number[]>([]);
+  const [arr, setArr] = useState<ILetter[]>([]);
+  const [value, setValue] = useState('');
+  const [isRevers, setIsRevers] = useState(false);
 
-  const  {values, handleInputChange} = useInputHandlers({
-    string: ''
-  })
+  const handleClick = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value)
+  }
   
   const onClick = async(e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setString(true)
-    const withoutSpaces = values.value.replace(/\s/g, ''); 
-    const newArr = withoutSpaces.split('');
-    setArr(newArr)
-    
-    setStep(0);
-    stringReverse(newArr, 0);
-    setColor([]);
+    setIsRevers(true)
+    const letters = value.replace(/\s/g, '').split('').map((letter) => ({
+      letter: letter,
+      state: ElementStates.Default
+    }))
+    setArr(letters)
+    setValue('')
   }
 
   //рекурсивный алгоритм
-  const stringReverse = (arr: string[], index: number) => {
-    if (index < arr.length / 2) {
+  const stringReverse = (arr: ILetter[], start: number, end: number) => {
+    if(start >= end){
       setTimeout(() => {
-        const temp = arr[index];
-        arr[index] = arr[arr.length - 1 - index];
-        arr[arr.length - 1 - index] = temp;
-        
-        setStep(2)
-        setColor([index, arr.length - 1 - index]);
-        //создаем новую копию массива, за  счет чего происходит перерендер
-        setArr([...arr]);
-        stringReverse(arr, index + 1);
-      }, 2000);
-    } else {
-      setStep(1);
-      setColor([]);
+        setArr((prevArr) =>
+        prevArr.map((letter) => ({
+          ...letter,
+          state: ElementStates.Modified
+        }))
+      )
+      setIsRevers(false);
+      }, 1000)
+      return
     }
+    setTimeout(() => {
+
+      //меняем местами буквы и перекрашиваем цвета
+      const temp = arr[start].letter;
+      arr[start].letter = arr[end].letter;
+      arr[start].state = ElementStates.Modified;
+      arr[end].letter = temp;
+      arr[end].state = ElementStates.Modified;
+  
+      //создаем новую копию массива, за  счет чего происходит перерендер
+      setArr([...arr])
+
+      //ставим новый цвет поменявшихся букв
+      setArr((PrevArr) => {
+        const newArr = [...PrevArr]
+        newArr[start] = {
+          ...newArr[start],
+          state: ElementStates.Changing
+        }
+        newArr[end] = {
+          ...newArr[end],
+          state: ElementStates.Changing,
+        };
+        return newArr;
+      })
+
+      stringReverse(arr, start + 1, end -1)
+    }, 1000)  
   };
 
+  useEffect(() => {
+    if(isRevers){
+      const newArr = [...arr]
+      const start = 0;
+      const end = arr.length - 1;
+      stringReverse(newArr, start, end)
+    }
+  }, [isRevers])
 
   return (
     <SolutionLayout title="Строка">
       <form className={styles.box} onSubmit={onClick}>
-        <Input width={377} maxLength={11} isLimitText onChange={handleInputChange}/>
-        <Button text="Развернуть" type="submit"/>
+        <Input width={377} maxLength={11} value={value} isLimitText onChange={handleClick}/>
+        <Button text="Развернуть" type="submit" isLoader={isRevers}/>
       </form>
       <div className={styles.container}>
-        {string || step === 0
-          ? arr.map((letter, index) => (
-            <Circle 
-              letter={letter}
-              key={index} 
-              state={
-              step === 0 ? ElementStates.Default :
-              color.includes(index) ? ElementStates.Changing : ElementStates.Default 
-              }
-            />))
-          : null} 
+        {arr.map((letter, index) => (
+          <Circle key={index} letter={letter.letter} state={arr[index]?.state}/>
+        ))}
       </div>
     </SolutionLayout>
   );
