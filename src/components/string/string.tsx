@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, memo } from "react";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
 import { Input } from "../ui/input/input";
 import styles from './string.module.css'
@@ -35,47 +35,48 @@ export const StringComponent: React.FC = () => {
   }
 
   //рекурсивный алгоритм
-  const stringReverse = (arr: ILetter[], start: number, end: number) => {
-    if(start >= end){
-      setTimeout(() => {
-        setArr((prevArr) =>
+  const stringReverse = async (arr: ILetter[], start: number, end: number) => {
+    if (start >= end) {
+      await new Promise((resolve) => setTimeout(resolve, 1000)); 
+      setArr((prevArr) =>
         prevArr.map((letter) => ({
           ...letter,
           state: ElementStates.Modified
         }))
-      )
+      );
       setIsRevers(false);
-      }, 1000)
-      return
+      return;
     }
-    setTimeout(() => {
-
-      //меняем местами буквы и перекрашиваем цвета
-      const temp = arr[start].letter;
-      arr[start].letter = arr[end].letter;
-      arr[start].state = ElementStates.Modified;
-      arr[end].letter = temp;
-      arr[end].state = ElementStates.Modified;
   
-      //создаем новую копию массива, за  счет чего происходит перерендер
-      setArr([...arr])
-
-      //ставим новый цвет поменявшихся букв
-      setArr((PrevArr) => {
-        const newArr = [...PrevArr]
-        newArr[start] = {
-          ...newArr[start],
-          state: ElementStates.Changing
-        }
-        newArr[end] = {
-          ...newArr[end],
-          state: ElementStates.Changing,
-        };
-        return newArr;
-      })
-
-      stringReverse(arr, start + 1, end -1)
-    }, 1000)  
+    // Устанавливаем цыет на кандидатах на перестановку
+    setArr((PrevArr) => {
+      const newArr = [...PrevArr];
+      newArr[start] = {
+        ...newArr[start],
+        state: ElementStates.Changing
+      };
+      newArr[end] = {
+        ...newArr[end],
+        state: ElementStates.Changing
+      };
+      return newArr;
+    });
+  
+    // Добавляем задержку перед перестановкой
+    await new Promise((resolve) => setTimeout(resolve, 1000)); 
+  
+    // Меняем местами буквы
+    const temp = arr[start].letter;
+    arr[start].letter = arr[end].letter;
+    arr[start].state = ElementStates.Modified;
+    arr[end].letter = temp;
+    arr[end].state = ElementStates.Modified;
+  
+    // Создаем новую копию массива, чтобы произошел перерендер
+    setArr([...arr]);
+  
+    stringReverse(arr, start + 1, end - 1);
+    
   };
 
   useEffect(() => {
@@ -86,7 +87,7 @@ export const StringComponent: React.FC = () => {
       stringReverse(newArr, start, end)
     }
   }, [isRevers])
-
+  
   return (
     <SolutionLayout title="Строка">
       <form className={styles.box} onSubmit={onClick}>
