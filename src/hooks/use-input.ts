@@ -1,17 +1,12 @@
 import { useState } from 'react';
 
 
-//вспомогательная функция для обработки инпутов
-export function useInputHandlers(inputValues: {[name: string]: string}) {
-  const [values, setInputValues] = useState(inputValues);
+export function useInput(inputValues: {[name: string]: string}) {
+  const [values, setValues] = useState(inputValues);
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = event.target;
-    setInputValues((prevValues) => ({
-      ...prevValues,
-     value,
-    }));
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const {value, name} = event.target;
+    setValues({...values, [name]: value});
   };
-
-  return {values, handleInputChange, setInputValues};
+  return {values, handleChange, setValues};
 }

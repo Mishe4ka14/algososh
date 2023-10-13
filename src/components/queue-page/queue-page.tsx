@@ -4,107 +4,73 @@ import { Button } from "../ui/button/button";
 import { useState } from "react";
 import { Circle } from "../ui/circle/circle";
 import { Input } from "../ui/input/input";
-import { ElementStates } from "../../types/element-states";
 import styles from './queue-page.module.css';
+import { Queue } from "./queue-page-class";
 
-interface IElem {
-  letter?: string
-  state: ElementStates
-}
-
-export const QueuePage: React.FC = () => {
-
-  const [value, setValue] = useState('');
-  const [arr, setArr] = useState<IElem[]>([]);
-  const [valuesArr, setValuesArr] = useState<string[]>([]) 
-  const [head, setHead] = useState(0);
-  const [tail, setTail] = useState(0);
-  const [isAdd, setIsAdd] = useState(false);
-  const [isDelete, setIsDelete] = useState(false);
-  const [addDisable, setAddDisable] = useState(false);
-
-  const handleClick = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(e.target.value)
-  }
-
-const addStarterArr = () => {
-  const firstArr:IElem[] = [];
-    for(let i = 0; i < 7; i++){
-      const first: IElem = {letter: '', state: ElementStates.Default};
-      firstArr.push(first)
-    }
-    setArr(firstArr)
-}
-
-  useEffect(() => {
-    addStarterArr();
-  }, [])
-
-  useEffect(() => {
-    setAddDisable(tail === 7);
-  }, [tail]);
-
-  const enqueue = () => {
-    setIsAdd(true)
-    if ( value && tail < 7) {
-      const updatedArr = [...arr];
-      updatedArr[tail] = { letter: value, state: ElementStates.Changing };
-      setArr(updatedArr);
-      setTimeout(() => {
-        updatedArr[tail].state = ElementStates.Default;
-        setArr(updatedArr);
-        setValue('');
-        setIsAdd(false);
-        setTail(tail + 1);
-      }, 500);
-    }
-  };
+  export const QueuePage: React.FC = () => {
+    const [queue, setQueue] = useState<Queue>(new Queue());
+    const [value, setValue] = useState("");
+    const [isAddDisabled, setIsAddDisabled] = useState(false);
+    const [isAdd, setIsAdd] = useState(false);
+    const [isDelete, setIsDelete] = useState(false);
   
-  const dequeue = () => {
-    setIsDelete(true)
-    if ( head < tail) {
-      const updatedArr = [...arr];
-      updatedArr[head] = { letter: '', state: ElementStates.Changing };
-      setArr(updatedArr);
+    const isDeleteDisabled = queue.isDeleteDisabled();
+    const arr = queue.getQueueArr();
+  
+    useEffect(() => {
+      if (queue.isAddDisabled()) setIsAddDisabled(true);
+    }, [queue]);
+  
+  
+    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setValue(e.target.value);
+    };
+  
+    const onAdd = () => {
+      setIsAdd(true);
+      queue.enqueue(value);
+  
       setTimeout(() => {
-        updatedArr[head].state = ElementStates.Default;
-        setArr(updatedArr);
-        setIsDelete(false);
-        setHead(head + 1);
+        setQueue(queue);
+        setValue("");
+        setIsAdd(false);
       }, 500);
-    }
-  };
-
-  const deleteAll = () => {
-    addStarterArr();
-    setHead(0);
-    setTail(0);
-    setAddDisable(true)
-    setTimeout(() => {
-      setAddDisable(false)
-    }, 500)
-  }
-
-  return (
+    };
+  
+    const onDelete = () => {
+      setIsDelete(true);
+      queue.dequeue();
+  
+      setTimeout(() => {
+        setQueue(queue);
+        setIsDelete(false);
+      }, 500);
+    };
+  
+    const onClear = () => {
+      queue.clear();
+      setIsAddDisabled(true);
+      setTimeout(() => {
+        setQueue(queue);
+        setIsAddDisabled(false);
+      }, 1000);
+    };
+  
+    return (
     <SolutionLayout title="Очередь">
       <div className={styles.box}>
-        <Input maxLength={4} width={400} isLimitText max={4} onChange={handleClick} value={value} disabled={isDelete || isAdd}/>
-        <Button text="Добавить" onClick={enqueue} isLoader={isAdd} disabled={!value || isAdd || isDelete || addDisable}/>
-        <Button text="Удалить" onClick={dequeue} isLoader={isDelete} disabled={isDelete || isAdd}/>
-        <Button text="Очистить" onClick={deleteAll} extraClass="ml-30" disabled={isAdd || isDelete}/>
+        <Input maxLength={4} width={400} isLimitText max={4} onChange={onChange} value={value} disabled={isDelete || isAdd}
+        />
+        <Button text="Добавить" onClick={onAdd}isLoader={isAdd} disabled={!value || isAddDisabled || isDelete || isAdd}/>
+        <Button text="Удалить" onClick={onDelete} isLoader={isDelete} disabled={isDeleteDisabled || isDelete || isAdd} />
+        <Button text="Очистить" onClick={onClear} extraClass="ml-30" disabled={isDelete || isAdd} />
       </div>
       <div className={styles.container}>
         {arr.map((element, index) => (
-        <Circle 
-          key={index}
-          index={index}
-          letter={element.letter}
-          state={element.state}
-          head={index === head ? 'head' : null}
-          tail={index === tail - 1 ? 'tail' : null}
-        />
+          <Circle key={index} index={index} letter={element.letter} state={element.state} head={index === queue.getHead() ? "head" : null} tail={index === queue.getTail() - 1 ? "tail" : null}/>
         ))}
       </div>
     </SolutionLayout>
   );
 };
+

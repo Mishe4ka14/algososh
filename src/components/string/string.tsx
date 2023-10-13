@@ -3,7 +3,6 @@ import { SolutionLayout } from "../ui/solution-layout/solution-layout";
 import { Input } from "../ui/input/input";
 import styles from './string.module.css'
 import { Button } from "../ui/button/button";
-import { useInputHandlers } from "../../hooks/use-input";
 import { useState } from "react";
 import { Circle } from "../ui/circle/circle";
 import { ElementStates } from "../../types/element-states";
