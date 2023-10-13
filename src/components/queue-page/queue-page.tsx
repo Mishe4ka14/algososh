@@ -9,7 +9,7 @@ import styles from './queue-page.module.css';
 
 interface IElem {
   letter?: string
-  index: number
+  state: ElementStates
 }
 
 export const QueuePage: React.FC = () => {
@@ -17,59 +17,91 @@ export const QueuePage: React.FC = () => {
   const [value, setValue] = useState('');
   const [arr, setArr] = useState<IElem[]>([]);
   const [valuesArr, setValuesArr] = useState<string[]>([]) 
-
-
   const [head, setHead] = useState(0);
   const [tail, setTail] = useState(0);
+  const [isAdd, setIsAdd] = useState(false);
+  const [isDelete, setIsDelete] = useState(false);
+  const [addDisable, setAddDisable] = useState(false);
 
   const handleClick = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value)
   }
 
-  useEffect(() => {
-    const firstArr:IElem[] = [];
+const addStarterArr = () => {
+  const firstArr:IElem[] = [];
     for(let i = 0; i < 7; i++){
-      const first: IElem = {letter: '', index: i};
+      const first: IElem = {letter: '', state: ElementStates.Default};
       firstArr.push(first)
     }
     setArr(firstArr)
+}
+
+  useEffect(() => {
+    addStarterArr();
   }, [])
 
-  const enqueue = (item: string) => {
-    if (tail < 7 && item !== '') {
+  useEffect(() => {
+    setAddDisable(tail === 7);
+  }, [tail]);
+
+  const enqueue = () => {
+    setIsAdd(true)
+    if ( value && tail < 7) {
       const updatedArr = [...arr];
-      updatedArr[tail] = { letter: item, index: tail };
+      updatedArr[tail] = { letter: value, state: ElementStates.Changing };
       setArr(updatedArr);
-      setTail(tail + 1);
-      setValue('');
+      setTimeout(() => {
+        updatedArr[tail].state = ElementStates.Default;
+        setArr(updatedArr);
+        setValue('');
+        setIsAdd(false);
+        setTail(tail + 1);
+      }, 500);
     }
   };
   
   const dequeue = () => {
-    if (head < tail) {
+    setIsDelete(true)
+    if ( head < tail) {
       const updatedArr = [...arr];
-      updatedArr[head] = { letter: '', index: head };
+      updatedArr[head] = { letter: '', state: ElementStates.Changing };
       setArr(updatedArr);
-      setHead(head + 1);
+      setTimeout(() => {
+        updatedArr[head].state = ElementStates.Default;
+        setArr(updatedArr);
+        setIsDelete(false);
+        setHead(head + 1);
+      }, 500);
     }
   };
+
+  const deleteAll = () => {
+    addStarterArr();
+    setHead(0);
+    setTail(0);
+    setAddDisable(true)
+    setTimeout(() => {
+      setAddDisable(false)
+    }, 500)
+  }
 
   return (
     <SolutionLayout title="Очередь">
       <div className={styles.box}>
-        <Input maxLength={4} width={400} isLimitText max={4} onChange={handleClick} value={value}/>
-        <Button text="Добавить" onClick={() => enqueue(value)}/>
-        <Button text="Удалить" onClick={dequeue}/>
-        <Button text="Очистить" extraClass="ml-30" />
+        <Input maxLength={4} width={400} isLimitText max={4} onChange={handleClick} value={value} disabled={isDelete || isAdd}/>
+        <Button text="Добавить" onClick={enqueue} isLoader={isAdd} disabled={!value || isAdd || isDelete || addDisable}/>
+        <Button text="Удалить" onClick={dequeue} isLoader={isDelete} disabled={isDelete || isAdd}/>
+        <Button text="Очистить" onClick={deleteAll} extraClass="ml-30" disabled={isAdd || isDelete}/>
       </div>
       <div className={styles.container}>
-        {arr.map((element) => (
-        <Circle
-          key={element.index}
-          index={element.index}
+        {arr.map((element, index) => (
+        <Circle 
+          key={index}
+          index={index}
           letter={element.letter}
-          head={element.index === head && (head !== 0 || element.letter !== '') ? 'head' : null}
-          tail={element.index === tail - 1 && element.letter !== '' ? 'tail' : null}
+          state={element.state}
+          head={index === head ? 'head' : null}
+          tail={index === tail - 1 ? 'tail' : null}
         />
         ))}
       </div>
