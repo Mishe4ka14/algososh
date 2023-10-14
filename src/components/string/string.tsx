@@ -91,7 +91,7 @@ export const StringComponent: React.FC = () => {
     <SolutionLayout title="Строка">
       <form className={styles.box} onSubmit={onClick}>
         <Input width={377} maxLength={11} value={value} isLimitText onChange={handleClick}/>
-        <Button text="Развернуть" type="submit" isLoader={isRevers}/>
+        <Button text="Развернуть" type="submit" isLoader={isRevers} disabled={!value}/>
       </form>
       <div className={styles.container}>
         {arr.map((letter, index) => (

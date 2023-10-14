@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
 import { Button } from "../ui/button/button";
 import { Direction } from "../../types/direction";
@@ -44,6 +44,11 @@ export const SortingPage: React.FC = () => {
     return arr;
   }
   
+  useEffect(() => {
+    const initialArr = randomArr();
+    setArr(initialArr);
+  }, []);
+
   const onClick = async() => {
     const initialArr = randomArr();
     setArr(initialArr);

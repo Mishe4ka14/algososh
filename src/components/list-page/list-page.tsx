@@ -255,8 +255,8 @@ export const ListPage: React.FC = () => {
         </div>
         <div className={styles.box2}>
           <Input placeholder="Введите индекс" width={300} type="number"  name='indexInput' onChange={handleChange} value={values.indexInput} disabled={buttonsState.indexInput.disabled}/>
-          <Button text="Добавить по индексу" onClick={addElementByIndex} isLoader={buttonsState.addAt.isLoader}/>
-          <Button text="Удалить по индексу"  onClick={deleteElementByIndex}  isLoader={buttonsState.deleteAt.isLoader}/>
+          <Button text="Добавить по индексу" onClick={addElementByIndex} isLoader={buttonsState.addAt.isLoader} disabled={parseInt(values.indexInput) > linkedList.toArray().length -1}/>
+          <Button text="Удалить по индексу"  onClick={deleteElementByIndex}  isLoader={buttonsState.deleteAt.isLoader} disabled={parseInt(values.indexInput) > linkedList.toArray().length -1}/>
         </div>
       </div>
       <div className={styles.elements}>
