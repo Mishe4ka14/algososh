@@ -254,7 +254,7 @@ export const ListPage: React.FC = () => {
           <Button text="Удалить из tail"  onClick={deleteElementTail} disabled={buttonsState.deleteTail.disabled || linkedList.toArray().length === 0} isLoader={buttonsState.deleteTail.isLoader}/>
         </div>
         <div className={styles.box2}>
-          <Input placeholder="Введите индекс" width={300} name='indexInput' onChange={handleChange} value={values.indexInput} disabled={buttonsState.indexInput.disabled}/>
+          <Input placeholder="Введите индекс" width={300} type="number"  name='indexInput' onChange={handleChange} value={values.indexInput} disabled={buttonsState.indexInput.disabled}/>
           <Button text="Добавить по индексу" onClick={addElementByIndex} isLoader={buttonsState.addAt.isLoader}/>
           <Button text="Удалить по индексу"  onClick={deleteElementByIndex}  isLoader={buttonsState.deleteAt.isLoader}/>
         </div>
