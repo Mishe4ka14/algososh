@@ -1,0 +1,16 @@
+.box {
+  display: flex;
+  justify-content:center;
+  gap: 10px;
+  margin: 0;
+}
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 0 auto;
+  margin-top: 120px;
+  gap: 30px;
+  max-width: 1100px;
+}
