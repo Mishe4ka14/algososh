@@ -6,7 +6,6 @@ import { RadioInput } from "../ui/radio-input/radio-input";
 import styles from './sorting-page.module.css'
 import { Column } from "../ui/column/column";
 import { ElementStates } from "../../types/element-states";
-import { finished } from "stream";
 
 interface IColumn {
   size: number
