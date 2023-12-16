@@ -10,10 +10,15 @@ import { finished } from "stream";
 
 interface IColumn {
   size: number
+  id?: number
   state: ElementStates
 }
 
-export const SortingPage: React.FC = () => {
+interface IProps {
+  arrLength?: number
+}
+
+export const SortingPage: React.FC <IProps> = ( {arrLength}: IProps ) => {
   
   const [arr, setArr] = useState<IColumn[]>([]);
   const [loading, setLoading] = useState(false);
@@ -31,27 +36,33 @@ export const SortingPage: React.FC = () => {
     setBubble(false)
   }
 
-  const randomArr = (): IColumn[] => {
-    const arrSize = randomNum(3, 17);
-    const arr:IColumn[] = [];
-    for(let i = 0; i < arrSize; i++){
-      const column: IColumn = {
-        size: randomNum(1, 100),
-        state: ElementStates.Default 
-      };
-     arr.push(column);
-    }
-    return arr;
+  const randomArr = () => {
+    let arr = Array.from({length: randomNum(arrLength ?? 3, arrLength ?? 17)}, () => Math.floor(Math.random() * 100))
+    setArr(arr.map((number, index) => {
+      return { id: index + 1, size: number, state: ElementStates.Default }
+    }))
   }
   
   useEffect(() => {
-    const initialArr = randomArr();
-    setArr(initialArr);
-  }, []);
+    if(arrLength === 0) {
+      setArr([])
+    } else if (arrLength === 1) { 
+      const randonNumber = Math.random();
+      setArr([{size: randonNumber, id: 1, state: ElementStates.Default}])
+    } else {
+      randomArr()
+    }
+  }, [])
 
   const onClick = async() => {
-    const initialArr = randomArr();
-    setArr(initialArr);
+    if(arrLength === 0) {
+      setArr([])
+    } else if (arrLength === 1) { 
+      const randonNumber = Math.random();
+      setArr([{size: randonNumber, id: 1, state: ElementStates.Default}])
+    } else {
+      randomArr()
+    }
   }
   
   function randomNum(min: number, max: number):number {
@@ -194,14 +205,16 @@ export const SortingPage: React.FC = () => {
           <RadioInput label="Пузырек" onChange={onBubble} checked={bubble} disabled={loading}/>
         </div>
         <div className={styles.container}>
-          <Button text="По возрастанию" type="button" sorting={Direction.Ascending} onClick={() => { changeSort(true); setIsUp(true) }} disabled={loading} isLoader={isUp && loading}/>
-          <Button text="По убыванию" sorting={Direction.Descending} onClick={() => { changeSort(false); setIsUp(false)}} disabled={loading} isLoader={!isUp && loading}/>
+          <Button text="По возрастанию" data-testid='btn-up' type="button" sorting={Direction.Ascending} onClick={() => { changeSort(true); setIsUp(true) }} disabled={loading} isLoader={isUp && loading}/>
+          <Button text="По убыванию" data-testid='btn-down' sorting={Direction.Descending} onClick={() => { changeSort(false); setIsUp(false)}} disabled={loading} isLoader={!isUp && loading}/>
         </div>
         <Button text="Новый массив" onClick={onClick} disabled={loading}/>
       </div>
-      <div className={styles.columns}>
+      <div data-testid='array' className={styles.columns}>
         {arr.map((column, index) => (
-          <Column key={index} index={column.size} state={column.state}/>
+          <div data-testid = 'column' key={index}>
+            <Column key={index} index={column.size} state={column.state}/>
+          </div>
         ))}
       </div>
     </SolutionLayout>
