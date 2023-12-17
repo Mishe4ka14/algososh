@@ -14,24 +14,9 @@ export class Stack<T> {
     this.maxSize = maxSize;
   }
 
-  private setModifiedState(index: number) {
-    setTimeout(() => {
-      if (this.data[index - 1]?.state === ElementStates.Changing) {
-        this.data[index - 1].state = ElementStates.Default;
-      }
-    }, 1000);
-  }
-  
-  push(value: T) {
-    if (this.data.length < this.maxSize) {
-      const newData: IElem<T> = {
-        letter: value,
-        state: ElementStates.Changing,
-      };
-      this.data.push(newData);
-      this.setModifiedState(this.data.length);
-    }
-  }
+  push = (item: IElem<T>): void => {
+    this.data.push(item)
+};
 
   pop() {
     if (this.data.length === 0) return;
