@@ -5,6 +5,12 @@ import { Circle } from "../ui/circle/circle";
 import { Input } from "../ui/input/input";
 import {Stack} from "./stack-page-class"; 
 import styles from './stack-page.module.css';
+import { ElementStates } from "../../types/element-states";
+
+interface IElem {
+  letter: string;
+  state: ElementStates;
+}
 
 export const StackPage: React.FC = () => {
   const [stack, setStack] = useState<Stack<string>>(new Stack());
@@ -20,11 +26,13 @@ export const StackPage: React.FC = () => {
 
   const addElem = async () => {
     setIsAdd(true);
-    stack.push(value);
+    const newElement: IElem = {letter: value,  state: ElementStates.Changing}
+    stack.push(newElement)
     setTimeout(() => {
       setValue("");
       setStack(stack);
-      setIsAdd(false);
+      newElement.state = ElementStates.Default
+          setIsAdd(false);
     }, 500);
   }
 
@@ -49,10 +57,10 @@ export const StackPage: React.FC = () => {
   return (
     <SolutionLayout title="Стек">
       <div className={styles.box}>
-        <Input maxLength={4} width={400} isLimitText max={4} onChange={handleClick} value={value}/>
-        <Button text="Добавить" onClick={addElem} disabled={!value || isAdd || isDelete || stack.getSize() >= stack.getMaxSize()} isLoader={isAdd}/>
-        <Button text="Удалить" onClick={deleteElem} disabled={stack.getSize() === 0 || isAdd || isDelete} isLoader={isDelete}/>
-        <Button text="Очистить" extraClass="ml-30" onClick={deleteAll} disabled={stack.getSize() === 0 || isAdd || isDelete} isLoader={isCleaning}/>
+        <Input data-testid="input" maxLength={4} width={400} isLimitText max={4} onChange={handleClick} value={value}/>
+        <Button data-testid="add" text="Добавить" onClick={addElem} disabled={!value || isAdd || isDelete || stack.getSize() >= stack.getMaxSize()} isLoader={isAdd}/>
+        <Button data-testid="delete" text="Удалить" onClick={deleteElem} disabled={stack.getSize() === 0 || isAdd || isDelete} isLoader={isDelete}/>
+        <Button data-testid="clean" text="Очистить" extraClass="ml-30" onClick={deleteAll} disabled={stack.getSize() === 0 || isAdd || isDelete} isLoader={isCleaning}/>
       </div>
       <div className={styles.container}>
         {elements.map((element, index) => (
