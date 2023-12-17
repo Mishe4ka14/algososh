@@ -86,4 +86,7 @@ export class Queue implements QueueInterface {
   getTail(){
     return this.tail
   }
+
+  isEmpty = (): boolean => this.head === this.tail;
+
 }
