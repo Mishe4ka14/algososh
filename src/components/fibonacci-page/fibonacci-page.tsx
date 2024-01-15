@@ -65,8 +65,8 @@ const renderNumber = (numbers: string[]) => {
   return (
     <SolutionLayout title="Последовательность Фибоначчи">
       <form className={styles.box} onSubmit={onClick}>
-        <Input width={400} maxLength={2} isLimitText onChange={handleClick} type="number" min={1} max={19} value={value}/>
-        <Button text="Развернуть" type="submit" isLoader={loading} disabled={!value}/>
+        <Input  data-testid="input" width={400} maxLength={2} isLimitText onChange={handleClick} type="number" min={1} max={19} value={value}/>
+        <Button  data-testid="button" text="Развернуть" type="submit" isLoader={loading} disabled={!value}/>
       </form>
       <div className={styles.container}>
         {arr.map((num, index) => (

@@ -90,12 +90,14 @@ export const StringComponent: React.FC = () => {
   return (
     <SolutionLayout title="Строка">
       <form className={styles.box} onSubmit={onClick}>
-        <Input width={377} maxLength={11} value={value} isLimitText onChange={handleClick}/>
-        <Button text="Развернуть" type="submit" isLoader={isRevers} disabled={!value}/>
+        <Input data-testid="input" width={377} maxLength={11} value={value} isLimitText onChange={handleClick}/>
+        <Button data-testid="button" text="Развернуть" type="submit" isLoader={isRevers} disabled={!value}/>
       </form>
-      <div className={styles.container}>
+      <div data-testid='circles' className={styles.container}>
         {arr.map((letter, index) => (
-          <Circle key={index} letter={letter.letter} state={arr[index]?.state}/>
+          <div data-testid='circle' key={index}>
+            <Circle key={index} letter={letter.letter} state={arr[index]?.state}/>
+          </div>
         ))}
       </div>
     </SolutionLayout>

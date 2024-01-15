@@ -59,11 +59,11 @@ import { Queue } from "./queue-page-class";
     return (
     <SolutionLayout title="Очередь">
       <div className={styles.box}>
-        <Input maxLength={4} width={400} isLimitText max={4} onChange={onChange} value={value} disabled={isDelete || isAdd}
+        <Input  data-testid="input" maxLength={4} width={400} isLimitText max={4} onChange={onChange} value={value} disabled={isDelete || isAdd}
         />
-        <Button text="Добавить" onClick={onAdd}isLoader={isAdd} disabled={!value || isAddDisabled || isDelete || isAdd}/>
-        <Button text="Удалить" onClick={onDelete} isLoader={isDelete} disabled={isDeleteDisabled || isDelete || isAdd} />
-        <Button text="Очистить" onClick={onClear} extraClass="ml-30" disabled={isDelete || isAdd} />
+        <Button  data-testid="add" text="Добавить" onClick={onAdd}isLoader={isAdd} disabled={!value || isAddDisabled || isDelete || isAdd}/>
+        <Button  data-testid="delete" text="Удалить" onClick={onDelete} isLoader={isDelete} disabled={isDeleteDisabled || isDelete || isAdd} />
+        <Button  data-testid="clean" text="Очистить" onClick={onClear} extraClass="ml-30" disabled={isDelete || isAdd || queue.isEmpty()} />
       </div>
       <div className={styles.container}>
         {arr.map((element, index) => (
